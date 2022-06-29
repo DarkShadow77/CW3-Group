@@ -1,4 +1,4 @@
-https://github.com/DarkShadow77/CW2-Individuals
-https://darkshadow77.github.io/CW2-Individuals/
+https://github.com/DarkShadow77/CW3-Group
+https://darkshadow77.github.io/CW3-Group/
 https://cw2-individuals.herokuapp.com/
 https://cw2-individuals.herokuapp.com/collection/lessons
