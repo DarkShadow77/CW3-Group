@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>After School Club</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="manifest" href="index.webmanifest">
+    <script>
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
+
+</head>
+
+<body class="bg-dark text-white">
+    <div class="container-fluid p-5" id="app">
+        <div class="row d-flex justify-content-between">
+            <div class="col">
+                <h1 v-text="sitename"></h1>
+            </div>
+            
+            <div class="col d-flex justify-content-end">
+                <button class="btn btn-dark btn-outline-secondary" v-if="cart.length > 0" v-show="showProduct" v-on:click='showCheckout'>
+                    <span class="fas fa-cart-plus"></span> Cart <span class="badge bg-danger">{{cart.length}}</span>
+                </button>
+                <button class="btn btn-success" v-on:click="showCheckout" v-show="!showProduct"> 
+                    Inventory
+                </button>
+            </div>
+        </div>
+
+        
+        <div class="root">            
+            <main>
+                <div class="row" v-if='showProduct'>
+                    <div class="title-bar">
+                        <!-- Bar containing all sort inputs -->
+                        <div class="row py-4 d-flex justify-content-between">
+                            <div class="row col">
+                                <div class="col-md-4">
+                                    <select class="btn-secondary btn col-md-12 form-select" name="sortBy" id="select" v-model="sortBy"> Sort
+                                        <option disabled value="sort">--Sort By--</option>
+                                        <option value="subject">Subject</option>
+                                        <option value="location">Location</option>
+                                        <option value="price">Price</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <button v-on:click="ascending = !ascending" class="sort-button btn-secondary btn">
+                                        <i v-if="ascending" class="fa fa-sort-up">Ascending</i>
+                                        <i v-else class="fa fa-sort-down">Descending</i>
+                                    </button>
+                                </div>
+        
+                                <div class="col-md-4 col-sm-12 row d-flex justify-content-end">
+                                    <div class="col-md-10 col-sm-11">
+                                        <input  class="form-control me-2" type="text" v-model="searchItem" placeholder="Search">
+                                    </div>
+                                    <div class="col-md-2 col-sm-1">
+                                        <button class="btn btn-secondary"><i class="fa fa-search"></i></button>
+                                    </div> 
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- lessons-->
+                    <div class="col-md-6 col-lg-3 py-2" v-for="product in products">
+                        <div class=" bg-secondary text-white rounded">
+                            <img v-bind:src="product.image" class="card-img-top" width="200dp" height="250dp">
+                            <div class="card-body">
+                                <h2 class="card-title my-1">{{product.subject}}</h2>
+                                <h4 class="card-text">{{product.location}}</h4>
+                                <div class="card-text my-1">Price: ${{product.price}}</div>
+                                <div class="card-text my-1">Number of Spaces: {{ product.Numberofspaces}}</div>
+                                <div class="my-2">
+                                    <button class="btn btn-success" v-on:click="addToCart(product)" :disabled="!product.Numberofspaces">Add To Cart</button>
+                                    <span v-if="product.Numberofspaces">{{'Left '+ product.Numberofspaces}}</span>
+                                    <span v-else>This lesson is fully booked!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div v-else class="row">
+                    <div class="py-4 d-flex justify-content-between">
+                        <h4>Total Amount: {{total}}</h4>
+                    </div>
+                    
+                    <div class="col-md-3 py-5" v-for="product in cart">
+                        <div class="card bg-secondary text-white rounded">
+                            <img v-bind:src="product.image" class="card-img-top" width="100dp" height="150dp">
+                            <div class="card-body">
+                                <h2 class="card-title my-1">{{product.subject}}</h2>
+                                <h4 class="card-text">{{product.location}}</h4>
+                                <div class="card-text mt-3">Price: ${{product.price}}</div>
+                                <div class="card-text my-1">Number of Spaces: {{ product.Numberofspaces}}</div>
+                                <div class="my-2">
+                                    <button class="btn btn-danger" v-on:click="removeFromCart(product)">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="!cart.length > 0" class="cart__item"
+                        style="background-color: transparent; padding: 20px;">
+                        <div style="text-align: center; color: grey; font-size: 20px; font-weight: bold;">
+                        List Empty</div>
+                    </div>
+                    <div class="container my-3">
+                        <div class="row col-8 d-flex justify-content-end">
+                            <div class="col">
+                                <h3>Student Details</h3>
+                            </div>
+                            <div class="col">
+                                <input v-model="user.name" type="text" class="form-control" placeholder="Enter Name" required>
+                            </div>
+                            <div class="col">
+                                <input v-model="user.number" type="number" class="form-control" placeholder="Enter Phone Number" required>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="submit" class="btn btn-primary" @click="submit" v-on:click="submitForm" value="Checkout">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+    </div>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="js/main.js"></script>
+    
+</body>
+
+</html>
